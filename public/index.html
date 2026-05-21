@@ -3,80 +3,114 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>AquaTech | Página Inicial</title>
-
-    <script src="./js/sessao.js"></script>
-
-    <link rel="stylesheet" href="./css/estilo.css">
-    <link rel="icon" href="./assets/icon/favicon2.ico">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;1,100&display=swap"
+        rel="stylesheet">
+    <title>EasyServer</title>
 </head>
 
 <body>
-    <div class="header">
-      <div class="container">
-        <h1 class="titulo">AquaTech</h1>
-        <ul class="navbar">
-          <li class="agora">
-            <a href="#">Inicial</a>
-          </li>
-          <li>
-            <a href="simulador.html">Simulador</a>
-          </li>
-          <li>|</li>
-          <li>
-            <a href="login.html">Login</a>
-          </li>
-          <li>
-            <a href="cadastro.html">Cadastro</a>
-          </li>
-        </ul>
-      </div>
+    <header class="header">
+        <section>
+            <a href="index.html" class="logo">
+                <img src="assets/imgs/logoEasyServerPNG.png" alt="logo">
+            </a>
+            <nav class="navBar">
+                <a href="index.html">Home</a>
+                <a href="#sobre">Sobre</a>
+                <a href="login.html">Login </a>
+                <a href="cadastro.html">Cadastro</a>
+
+            </nav>
+        </section>
+    </header>
+
+    <div class="home-container">
+        <section id="home">
+            <div class="content">
+                <h3>FAZEMOS O MELHOR MONITORAMENTO PARA MELHORAR O SEU NEGÓCIO </h3>
+                <p>Trazemos um monitoramento para seus servidores, detectamos para agir antes que o problema tome conta.
+                </p>
+                <a href="simuladorFinanceiro.html" class="btn">INICIAR ANÁLISE</a>
+            </div>
+        </section>
     </div>
-  
-    <div class="banner">
-      <div class="container">
-        <p>Preservando <span>hoje</span> para existirem <span>amanhã</span>.</p>
-      </div>
-    </div>
-  
-    <div class="social">
-      <div class="container">
-        <div class="boxes">
-          <div class="box">
-            <img src="assets/imgs/planet-earth_color.png">
-            <h4>Missão</h4>
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et, quas cupiditate asperiores provident magnam
-              vitae illum iusto fugiat atque deleniti nulla sed iure suscipit, laborum, aliquid accusantium cum dicta
-              minima.</p>
-          </div>
-          <div class="box">
-            <img src="assets/imgs/lightbulb_color.png">
-            <h4>Visão</h4>
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et, quas cupiditate asperiores provident magnam
-              vitae illum iusto fugiat atque deleniti nulla sed iure suscipit, laborum, aliquid accusantium cum dicta
-              minima.</p>
-          </div>
-          <div class="box">
-            <img src="assets/imgs/growth_color.png">
-            <h4>Valores</h4>
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et, quas cupiditate asperiores provident magnam
-              vitae illum iusto fugiat atque deleniti nulla sed iure suscipit, laborum, aliquid accusantium cum dicta
-              minima.</p>
-          </div>
+
+    <section class="sobre" id="sobre">
+        <h2 class="title"> Sobre <span>Nós</span></h2>
+        <div class="row">
+            <div>
+                <img src="assets/imgs/imgSobre.png" alt="sobre_nos">
+            </div>
+            <div class="content">
+                <p>O EasyServer é uma plataforma de monitoramento de servidores que permite acompanhar, em tempo real,
+                    dados como temperatura e umidade dos racks.
+                    Seu objetivo é ajudar a prevenir falhas e proteger os equipamentos, oferecendo uma solução simples,
+                    prática e confiável para garantir mais segurança e estabilidade na infraestrutura.</p>
+                <a href="#" class="btn">SAIBA MAIS</a>
+
+            </div>
         </div>
-      </div>
+    </section>
+    <section class="entrar" id="entrar">
+        <div class="BolaTemp">
+            <img src="assets/imgs/BolaTemp.png" alt="BolaTemp">
+        </div>
+        <div class="content">
+            <h2 class="title2">ENTRE <span>AGORA</span></h2>
+            <p>e veja os dashborads de analises sobre o seu data center</p>
+            <a href="cadastro.html" class="btn">ENTRAR </a>
+        </div>
+        <div class="BolaUmi">
+            <img src="assets/imgs/BolaUmi.png" alt="BolaUmi">
+        </div>
+    </section>
+    <div class="content">
+        <h2 class="title3">COISAS PARA VOCÊ</h2>
+
     </div>
-  
-    <div class="footer">
-      <div class="container">
-        <h4>Feito com amor por aluno &hearts; SPTech &copy; 2023</h4>
-        <span class="version">v1.0.0</span>
-      </div>
-    </div>
-  </body>
+
+    <section class="coisas" id="coisas">
+        <div class="CardDahboard">
+            <img src="assets/imgs/Button.png" alt="CardDahboard">
+        </div>
+        <div class="CardAlertas">
+            <img src="assets/imgs/ButtonAlertas.png" alt="CardAlertas">
+        </div>
+
+        <div class="CardReal">
+            <img src="assets/imgs/ButtonReal.png" alt="CardReal">
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-container">
+
+            <div class="footer-section">
+                <h4>Projeto Acadêmico</h4>
+                <p>Curso de Sistemas da Informação</p>
+                <p>Foco em IoT e Sustentabilidade</p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Tecnologias</h4>
+                <ul>
+                    <li>• Arduino</li>
+                    <li>• Sensor LDR</li>
+                    <li>• Eficiência Energética</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 EasyServer - Projeto Acadêmico de controle de umidade e temperatura</p>
+            <p>Monitoramento inteligente</p>
+        </div>
+    </footer>
+</body>
 
 </html>
