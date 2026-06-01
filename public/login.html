@@ -82,6 +82,13 @@
     msg_email.innerHTML = "";
     msg_senha.innerHTML = "";
 
+
+    if (emailVar.includes('@suporteN3')) {
+      window.location = "bob.html";
+      return;
+      
+    } 
+
     if (emailVar == "" || senhaVar == "") {
       cardErro.style.display = "block";
       mensagem_erro.innerHTML = "Preencha todos os campos antes de continuar.";
