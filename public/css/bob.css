@@ -1,14 +1,22 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #63B1BC;
-    margin: 0;
-    padding: 0;
+body { margin: 0; width: 100%; min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('../assets/ago_downloaded.gif');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 #container {
-    width: 80%;
-    margin: 50px auto;
+    width: 400px;
+    padding: 100px 300px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
     text-align: center;
+    box-shadow: 0 10px 40px rgba(255, 255, 255, 0.5);
 }
 
 h1 {
@@ -31,13 +39,13 @@ button {
 }
 
 button {
-    background-color: #ED145B;
+    background-color: #1F2A44;
     color: #FFFFFF;
     border: none;
 }
 
 button:hover {
-    background-color: #EFB661;
+    background-color: #000000;
 }
 
 #resposta {
@@ -48,4 +56,14 @@ button:hover {
     border: 1px solid #63666A;
     text-align: left;
     display: none;
+}
+.bot-sair{
+    background-color: #1F2A44;
+
+    position: fixed;
+    top: 10px;
+    left: 10px;
+}
+.bot-sair:hover {
+    background-color: #000000;
 }
