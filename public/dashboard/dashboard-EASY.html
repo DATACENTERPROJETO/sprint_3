@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>EasyServer</title>
+
+    <link rel="stylesheet" href="../css/dashboard-AESY.css">
+    
+    <script src="../js/sessao.js"></script>
+    <script src="./../js/alerta.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <header class="header">
+        <section class="header-content">
+
+            <a href="index.html" class="logo">
+                <img src="../assets/imgs/logoEasyServerPNG.png" alt="logo">
+            </a>
+
+            <h2>Dashboard</h2>
+
+            <nav>
+                <a href="../index.html" class="btn-sair">Sair</a>
+            </nav>
+
+        </section>
+    </header>
+
+    <main class="main">
+        <div class="resumo-datacenter">
+
+            <div class="card-resumo">
+                <h4>Total de Racks</h4>
+                <p id="totalRacks"></p>
+            </div>
+
+            <div class="card-resumo-normais">
+                <h4>Normais</h4>
+                <p class="faixa"> 20° - 25°<br>45% - 55%</p>
+                <p id="totalNormal"></p>
+            </div>
+
+            <div class="card-resumo-atencao">
+                <h4> Atenção</h4>
+                <p class="faixa">18° - 27° <br>40% - 60% </p>
+                <p id="totalAtencao"></p>
+            </div>
+
+            <div class="card-resumo-critico">
+                <h4> Críticos</h4>
+                <p class="faixa"> <18 ou >27° <br> <40% ou>60% </p>
+                <p id="totalCritico"></p>
+            </div>
+
+        </div>
+
+        <div class="top-bar">
+            <div class="rack-info">
+                <h3>Rack Monitorado</h3>
+                <select id="sensor"> </select>
+
+                <p> Sensor:<span id="sensorSelecionado"></span></p>
+                <p>Última atualização:<span id="ultimaAtualizacao"></span></p>
+            </div>
+
+        </div>
+
+
+        <div class="container">
+            <div class="esquerda">
+                <div class="kpis">
+
+                    <div class="card">
+                        <h3>Temperatura Atual</h3>
+                        <p id="tempAtual"></p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Umidade Atual</h3>
+                        <p id="umiAtual"></p>
+                    </div>
+
+                </div>
+
+                <div class="linha">
+                    <div class="graficoMenor">
+                        <h3>Temperatura</h3>
+                        <canvas id="graficoTemp"></canvas>
+                    </div>
+
+                    <div class="graficoMenor">
+                        <h3>Umidade</h3>
+                        <canvas id="graficoUmidade"></canvas>
+                    </div>
+
+                </div>
+
+                <div class="graficoGrande">
+
+                    <h3> Histórico de Temperatura e Umidade</h3>
+                    <canvas id="graficoPrincipal"></canvas>
+
+                </div>
+            </div>
+
+
+            <div class="direita">
+                <div class="box-alerta">
+                    <h2>Alertas Ativos</h2>
+                    <p id="alertas"></p>
+                    <div id="listaAlertas">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // GRÁFICOS I
+
+        const graficoPrincipal = new Chart(document.getElementById("graficoPrincipal"),{
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Temperatura',
+                            data: []
+                        },
+                        {
+                            label: 'Umidade',
+                            data: []
+                        }
+                    ]
+                }
+            }
+        );
+
+        const graficoTemp = new Chart(
+            document.getElementById("graficoTemp"), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Temperatura',
+                            data: []
+                        }
+                    ]
+                }
+            }
+        );
+
+        const graficoUmidade = new Chart(
+            document.getElementById("graficoUmidade"),{
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Umidade',
+                            data: []
+                        }]
+                }
+            }
+        );
+
+
+
+    </script>
+</body>
+
+</html>
