@@ -6,7 +6,7 @@
     <title>EasyServer</title>
 
     <link rel="stylesheet" href="../css/dashboard-AESY.css">
-    
+
     <script src="../js/sessao.js"></script>
     <script src="./../js/alerta.js"></script>
 
@@ -62,14 +62,12 @@
         <div class="top-bar">
             <div class="rack-info">
                 <h3>Rack Monitorado</h3>
-                <select id="sensor"> </select>
+                <select id="sensor" onchange="obterDadosGrafico(this.value)"></select>
 
-                <p> Sensor:<span id="sensorSelecionado"></span></p>
-                <p>Última atualização:<span id="ultimaAtualizacao"></span></p>
+                <p>Sensor: <span id="sensorSelecionado"></span></p>
+                <p>Última atualização: <span id="ultimaAtualizacao"></span></p>
             </div>
-
         </div>
-
 
         <div class="container">
             <div class="esquerda">
@@ -97,82 +95,148 @@
                         <h3>Umidade</h3>
                         <canvas id="graficoUmidade"></canvas>
                     </div>
-
                 </div>
 
                 <div class="graficoGrande">
-
-                    <h3> Histórico de Temperatura e Umidade</h3>
+                    <h3>Histórico de Temperatura e Umidade</h3>
                     <canvas id="graficoPrincipal"></canvas>
-
                 </div>
             </div>
-
 
             <div class="direita">
                 <div class="box-alerta">
                     <h2>Alertas Ativos</h2>
                     <p id="alertas"></p>
-                    <div id="listaAlertas">
-                    </div>
+                    <div id="listaAlertas"></div>
                 </div>
-
             </div>
         </div>
     </main>
 
     <script>
 
-        // GRÁFICOS I
+        let proximaAtualizacao;
+        let graficoPrincipal, graficoTemp, graficoUmidade;
 
-        const graficoPrincipal = new Chart(document.getElementById("graficoPrincipal"),{
+        // Ao carregar a página, popula o <select> com os sensores e os cards de resumo
+        window.onload = function () {
+            fetch('/sensores')
+                .then(res => res.json())
+                .then(sensores => {
+                    sensores.forEach(s => {
+                        document.getElementById('sensor').innerHTML +=
+                            `<option value="${s.idSensor}">${s.nomeLugar} — ${s.modeloSensor}</option>`;
+                    });
+
+                    if (sensores.length > 0) obterDadosGrafico(sensores[0].idSensor);
+                });
+
+            fetch('/sensores/resumo')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('totalRacks').textContent   = data.total;
+                    document.getElementById('totalNormal').textContent  = data.normais;
+                    document.getElementById('totalAtencao').textContent = data.atencao;
+                    document.getElementById('totalCritico').textContent = data.criticos;
+                });
+        };
+
+        // 1. Busca o histórico do sensor e monta os gráficos pela primeira vez
+        function obterDadosGrafico(idSensor) {
+
+            if (proximaAtualizacao) clearTimeout(proximaAtualizacao);
+
+            document.getElementById('sensorSelecionado').textContent =
+                document.getElementById('sensor').options[document.getElementById('sensor').selectedIndex]?.text || '';
+
+            fetch(`/sensores/medicoes/ultimas/${idSensor}`, { cache: 'no-store' })
+                .then(res => res.json())
+                .then(resposta => {
+                    resposta.reverse();
+                    plotarGrafico(resposta, idSensor);
+                })
+                .catch(erro => console.error('Erro ao obter dados:', erro));
+        }
+
+        // 2. Cria as três instâncias Chart.js com os dados históricos
+        function plotarGrafico(resposta, idSensor) {
+
+            const labels = [];
+            const dados = {
+                labels: labels,
+                datasets: [
+                    { label: 'Temperatura', data: [], borderColor: 'rgb(199, 52, 52)', fill: false, tension: 0.1 },
+                    { label: 'Umidade',     data: [], borderColor: 'rgb(75, 192, 192)', fill: false, tension: 0.1 }
+                ]
+            };
+
+            resposta.forEach(reg => {
+                labels.push(reg.dtMedicao);
+                dados.datasets[0].data.push(reg.temperatura);
+                dados.datasets[1].data.push(reg.umidade);
+            });
+
+            // destrói gráficos anteriores antes de recriar
+            if (graficoPrincipal) graficoPrincipal.destroy();
+            if (graficoTemp)      graficoTemp.destroy();
+            if (graficoUmidade)   graficoUmidade.destroy();
+
+            graficoPrincipal = new Chart(document.getElementById('graficoPrincipal'), { type: 'line', data: dados });
+
+            graficoTemp = new Chart(document.getElementById('graficoTemp'), {
                 type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'Temperatura',
-                            data: []
-                        },
-                        {
-                            label: 'Umidade',
-                            data: []
-                        }
-                    ]
-                }
-            }
-        );
+                data: { labels: [...labels], datasets: [{ ...dados.datasets[0], data: [...dados.datasets[0].data] }] }
+            });
 
-        const graficoTemp = new Chart(
-            document.getElementById("graficoTemp"), {
+            graficoUmidade = new Chart(document.getElementById('graficoUmidade'), {
                 type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'Temperatura',
-                            data: []
-                        }
-                    ]
-                }
-            }
-        );
+                data: { labels: [...labels], datasets: [{ ...dados.datasets[1], data: [...dados.datasets[1].data] }] }
+            });
 
-        const graficoUmidade = new Chart(
-            document.getElementById("graficoUmidade"),{
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'Umidade',
-                            data: []
-                        }]
-                }
-            }
-        );
+            setTimeout(() => atualizarGrafico(idSensor, dados), 2000);
+        }
 
+        // 3. Polling: busca o dado mais recente e desliza a janela dos gráficos
+        function atualizarGrafico(idSensor, dados) {
 
+            fetch(`/sensores/medicoes/tempo-real/${idSensor}`, { cache: 'no-store' })
+                .then(res => res.json())
+                .then(novoRegistro => {
+                    const novo = novoRegistro[0];
+
+                    if (novo.dtMedicao !== dados.labels[dados.labels.length - 1]) {
+
+                        // desliza a janela: remove o mais antigo, adiciona o novo
+                        dados.labels.shift();
+                        dados.labels.push(novo.dtMedicao);
+                        dados.datasets[0].data.shift();
+                        dados.datasets[0].data.push(novo.temperatura);
+                        dados.datasets[1].data.shift();
+                        dados.datasets[1].data.push(novo.umidade);
+
+                        // sincroniza gráficos menores
+                        graficoTemp.data.labels = [...dados.labels];
+                        graficoTemp.data.datasets[0].data = [...dados.datasets[0].data];
+                        graficoUmidade.data.labels = [...dados.labels];
+                        graficoUmidade.data.datasets[0].data = [...dados.datasets[1].data];
+
+                        graficoPrincipal.update();
+                        graficoTemp.update();
+                        graficoUmidade.update();
+
+                        // atualiza KPIs e top-bar
+                        document.getElementById('tempAtual').textContent         = `${novo.temperatura} °C`;
+                        document.getElementById('umiAtual').textContent          = `${novo.umidade} %`;
+                        document.getElementById('ultimaAtualizacao').textContent = novo.dtMedicao;
+                    }
+
+                    proximaAtualizacao = setTimeout(() => atualizarGrafico(idSensor, dados), 2000);
+                })
+                .catch(erro => {
+                    console.error('Erro ao atualizar gráfico:', erro);
+                    proximaAtualizacao = setTimeout(() => atualizarGrafico(idSensor, dados), 2000);
+                });
+        }
 
     </script>
 </body>
