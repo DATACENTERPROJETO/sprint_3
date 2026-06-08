@@ -85,7 +85,7 @@
     VALUES ('12.789.678/0025-90', 'ADUBE AZURE', 'AMANDA MARTINES', 'AV. FRADIQUE COUTINHO, 1000 - SÃO PAULO', 78923546);
 
     INSERT INTO Funcionario (fkEmpresa, senha, nome, email, cargo)
-    VALUES (2, 'SENHA56988', 'MARIA MOREIRA', 'MARIA.AZURE@GMAIL.COM.BR', 'GESTORA DE PROJETOS'),
+    VALUES (1, 'SENHA56988', 'MARIA MOREIRA', 'MARIA.AZURE@GMAIL.COM.BR', 'GESTORA DE PROJETOS'),
     (1, 'SENHA12256', 'CARLOS ALMEIDA', 'CARLOS@TECHCORP.COM.BR', 'GERENTE DE TI');
 
     INSERT INTO Lugar (nome, tipo, descricaoLugar, fkEmpresa)
@@ -95,7 +95,7 @@
 
 
     INSERT INTO Sensor (modeloSensor, fkEmpresa,  fkLugar, statusSensor, dtInstalacao)
-    VALUES ('DHT11', 1, 3, 'Inativo', '2026-08-14'),
+    VALUES ('DHT11', 1, 1, 'Inativo', '2026-08-14');
         
     -- SELECT 
 
@@ -103,25 +103,3 @@
     SELECT * FROM Funcionario;
 
 
-    SELECT empresa.nome AS 'Nome Da Empresa', 
-    lugar.nome AS 'Local do Sensor', 
-    descricaoLugar AS 'Descrição do Local', 
-    modeloSensor AS 'Modelo Do Sensor', 
-    statusSensor AS 'Status Do Sensor', 
-    valor AS 'Valor Da Medida', 
-    unidadeDeMedida AS 'Unidade De Medida' 
-    FROM Empresa JOIN Lugar ON idEmpresa = fkEmpresa 
-    JOIN Sensor ON idLugar = fkLugar 
-    JOIN Medicoes ON idSensor = fkSensor;
-
-    SELECT CASE 
-        WHEN valor >= 27 THEN 'Perigo - Temperatura Alta'
-        WHEN valor <= 18 THEN 'Perigo - Temperatura Baixa'
-    END AS 'Valor de Medida',
-    empresa.nome AS 'Nome Da Empresa',
-    lugar.nome AS 'Local do Sensor',
-    descricaoLugar AS 'Descrição do Local', 
-    unidadeDeMedida AS 'Unidade De Medida'
-    FROM Empresa JOIN Lugar ON idEmpresa = fkEmpresa 
-    JOIN Sensor ON idLugar = fkLugar 
-    JOIN Medicoes ON idSensor = fkSensor;

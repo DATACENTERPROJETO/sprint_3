@@ -15,9 +15,9 @@ function autenticar(req, res) {
 
                 if (resultado.length == 1) {
                     res.json({
-                        id:    resultado[0].id,
+                        id: resultado[0].id,
                         email: resultado[0].email,
-                        nome:  resultado[0].nome,
+                        nome: resultado[0].nome,
                     });
                 } else if (resultado.length == 0) {
                     res.status(403).send("Email e/ou senha inválido(s)");
@@ -33,11 +33,11 @@ function autenticar(req, res) {
 }
 
 function cadastrar(req, res) {
-    var nome     = req.body.nomeServer;
-    var email    = req.body.emailServer;
+    var nome = req.body.nomeServer;
+    var email = req.body.emailServer;
     var telefone = req.body.telefoneServer;
-    var cpf      = req.body.cpfServer;
-    var senha    = req.body.senhaServer;
+    var cpf = req.body.cpfServer;
+    var senha = req.body.senhaServer;
 
     if (nome == undefined) {
         res.status(400).send("Seu nome está undefined!");
