@@ -21,15 +21,15 @@
 
             <div class="logo">
 
-                <img src="./../imgs/logoEasyServerPNG.png">
+                <img src="../assets/imgs/logoEasyServerPNG.png">
 
                 <h1>EasyServer</h1>
 
-                <p>Monitoramento de Servidores</p>
+                <p>Monitoramento de Servidores</p><br><br>  
                 <section class="hero">
 
                 <h1>
-                    BEM-VINDO,<br>
+                    BOAS VINDAS,<br>
                     <span> <div class="hello">
                             <h3> <span id="b_usuario">usuário</span>!</h3>
                         </div></span>
@@ -38,11 +38,11 @@
 
 
             </div>
-
-            <nav class="menu">
+<nav class="menu">
                 <a href="#" onclick="limparSessao()">Sair</a>
-
-            </nav>
+                    <a href="https://sptech-03261044.atlassian.net/servicedesk/customer/portal/1"
+                    class="btn-suporte">Suporte</a>
+                </nav>       
         </div>
         <br>
 
@@ -55,19 +55,12 @@
                 <img src="../assets/imgs/logoEasyServerPNG.png" alt="logo">
             </a>
 
-            <h2>Dashboard</h2>
-
-            <nav>
-                <a href="https://sptech-03261044.atlassian.net/servicedesk/customer/portal/1"
-                    class="btn-suporte">Suporte</a>
-                <a href="../index.html" class="btn-sair">Sair</a>
-            </nav>
 
         </section>
     </header>
 
     <main class="main">
-        <div class="resumo-datacenter">
+          <div class="resumo-datacenter">
 
             <div class="card-resumo">
                 <h4>Total de Racks</h4>
@@ -76,23 +69,27 @@
 
             <div class="card-resumo-normais">
                 <h4>Normais</h4>
-                <p class="faixa"> 20° - 25°<br>45% - 55%</p>
+                <p class="faixa"> temp.20° - 25°<br>Umid.45% - 55%</p>
                 <p id="totalNormal"></p>
             </div>
 
             <div class="card-resumo-atencao">
                 <h4> Atenção</h4>
-                <p class="faixa">18° - 27° <br>40% - 60% </p>
+                <p class="faixa"> Temp.
+                    18 °C - 20°C e
+                    25°C - 27°C <br>Umid.
+                    40% - 45% e
+                    55% - 60%</p>
                 <p id="totalAtencao"></p>
             </div>
 
             <div class="card-resumo-critico">
                 <h4> Críticos</h4>
-                <p class="faixa">
-                    <18 ou>27° <br>
+                <p class="faixa">Temp.
+                    <18 ou>27° <br>Umid.
                         <40% ou>60%
                 </p>
-                <p id="totalCritico"></p>
+                <p id="totalCritico"><b></b></p>
             </div>
 
         </div>
@@ -165,7 +162,7 @@
 
     const idUsuario = sessionStorage.ID_USUARIO;
 
-    
+
         let proximaAtualizacao;
         let graficoPrincipal, graficoTemp, graficoUmidade;
 
