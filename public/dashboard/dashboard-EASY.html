@@ -119,30 +119,40 @@
         let proximaAtualizacao;
         let graficoPrincipal, graficoTemp, graficoUmidade;
 
-        // Ao carregar a página, popula o <select> com os sensores e os cards de resumo
         window.onload = function () {
             fetch('/sensores')
-                .then(res => res.json())
+  .then(res => {
+    if (!res.ok) throw new Error(`Erro HTTP ${res.status}: ${res.statusText}`);
+    return res.text(); // pega como texto primeiro
+  })
+  .then(text => {
+    if (!text) throw new Error('Resposta vazia do servidor');
+    return JSON.parse(text); // aí converte para JSON
+  })
                 .then(sensores => {
+                    if (!sensores || sensores.length === 0) return;
+
                     sensores.forEach(s => {
                         document.getElementById('sensor').innerHTML +=
                             `<option value="${s.idSensor}">${s.nomeLugar} — ${s.modeloSensor}</option>`;
                     });
 
-                    if (sensores.length > 0) obterDadosGrafico(sensores[0].idSensor);
-                });
+                    obterDadosGrafico(sensores[0].idSensor);
+                })
+                .catch(erro => console.error('Erro ao carregar sensores:', erro));
 
             fetch('/sensores/resumo')
                 .then(res => res.json())
                 .then(data => {
-                    document.getElementById('totalRacks').textContent   = data.total;
-                    document.getElementById('totalNormal').textContent  = data.normais;
-                    document.getElementById('totalAtencao').textContent = data.atencao;
-                    document.getElementById('totalCritico').textContent = data.criticos;
-                });
+                    if (!data) return;
+                    document.getElementById('totalRacks').textContent   = data.total   ?? '-';
+                    document.getElementById('totalNormal').textContent  = data.normais ?? '-';
+                    document.getElementById('totalAtencao').textContent = data.atencao ?? '-';
+                    document.getElementById('totalCritico').textContent = data.criticos ?? '-';
+                })
+                .catch(erro => console.error('Erro ao carregar resumo:', erro));
         };
 
-        // 1. Busca o histórico do sensor e monta os gráficos pela primeira vez
         function obterDadosGrafico(idSensor) {
 
             if (proximaAtualizacao) clearTimeout(proximaAtualizacao);
@@ -153,13 +163,17 @@
             fetch(`/sensores/medicoes/ultimas/${idSensor}`, { cache: 'no-store' })
                 .then(res => res.json())
                 .then(resposta => {
+                    if (!resposta || resposta.length === 0) {
+                        // sem dados ainda, tenta de novo em 2 segundos
+                        proximaAtualizacao = setTimeout(() => obterDadosGrafico(idSensor), 2000);
+                        return;
+                    }
                     resposta.reverse();
                     plotarGrafico(resposta, idSensor);
                 })
                 .catch(erro => console.error('Erro ao obter dados:', erro));
         }
 
-        // 2. Cria as três instâncias Chart.js com os dados históricos
         function plotarGrafico(resposta, idSensor) {
 
             const labels = [];
@@ -177,7 +191,6 @@
                 dados.datasets[1].data.push(reg.umidade);
             });
 
-            // destrói gráficos anteriores antes de recriar
             if (graficoPrincipal) graficoPrincipal.destroy();
             if (graficoTemp)      graficoTemp.destroy();
             if (graficoUmidade)   graficoUmidade.destroy();
@@ -197,7 +210,6 @@
             setTimeout(() => atualizarGrafico(idSensor, dados), 2000);
         }
 
-        // 3. Polling: busca o dado mais recente e desliza a janela dos gráficos
         function atualizarGrafico(idSensor, dados) {
 
             fetch(`/sensores/medicoes/tempo-real/${idSensor}`, { cache: 'no-store' })
@@ -205,9 +217,14 @@
                 .then(novoRegistro => {
                     const novo = novoRegistro[0];
 
+                    // ✅ sem dados ainda, aguarda e tenta de novo
+                    if (!novo) {
+                        proximaAtualizacao = setTimeout(() => atualizarGrafico(idSensor, dados), 2000);
+                        return;
+                    }
+
                     if (novo.dtMedicao !== dados.labels[dados.labels.length - 1]) {
 
-                        // desliza a janela: remove o mais antigo, adiciona o novo
                         dados.labels.shift();
                         dados.labels.push(novo.dtMedicao);
                         dados.datasets[0].data.shift();
@@ -215,7 +232,6 @@
                         dados.datasets[1].data.shift();
                         dados.datasets[1].data.push(novo.umidade);
 
-                        // sincroniza gráficos menores
                         graficoTemp.data.labels = [...dados.labels];
                         graficoTemp.data.datasets[0].data = [...dados.datasets[0].data];
                         graficoUmidade.data.labels = [...dados.labels];
@@ -225,7 +241,6 @@
                         graficoTemp.update();
                         graficoUmidade.update();
 
-                        // atualiza KPIs e top-bar
                         document.getElementById('tempAtual').textContent         = `${novo.temperatura} °C`;
                         document.getElementById('umiAtual').textContent          = `${novo.umidade} %`;
                         document.getElementById('ultimaAtualizacao').textContent = novo.dtMedicao;
