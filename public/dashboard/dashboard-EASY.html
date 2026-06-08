@@ -25,7 +25,8 @@
             <h2>Dashboard</h2>
 
             <nav>
-                <a href="https://sptech-03261044.atlassian.net/servicedesk/customer/portal/1" class="btn-suporte">Suporte</a>                
+                <a href="https://sptech-03261044.atlassian.net/servicedesk/customer/portal/1"
+                    class="btn-suporte">Suporte</a>
                 <a href="../index.html" class="btn-sair">Sair</a>
             </nav>
 
@@ -54,7 +55,10 @@
 
             <div class="card-resumo-critico">
                 <h4> Críticos</h4>
-                <p class="faixa"> <18 ou >27° <br> <40% ou>60% </p>
+                <p class="faixa">
+                    <18 ou>27° <br>
+                        <40% ou>60%
+                </p>
                 <p id="totalCritico"></p>
             </div>
 
@@ -121,14 +125,14 @@
 
         window.onload = function () {
             fetch('/sensores')
-  .then(res => {
-    if (!res.ok) throw new Error(`Erro HTTP ${res.status}: ${res.statusText}`);
-    return res.text(); // pega como texto primeiro
-  })
-  .then(text => {
-    if (!text) throw new Error('Resposta vazia do servidor');
-    return JSON.parse(text); // aí converte para JSON
-  })
+                .then(res => {
+                    if (!res.ok) throw new Error(`Erro HTTP ${res.status}: ${res.statusText}`);
+                    return res.text(); // pega como texto primeiro
+                })
+                .then(text => {
+                    if (!text) throw new Error('Resposta vazia do servidor');
+                    return JSON.parse(text); // aí converte para JSON
+                })
                 .then(sensores => {
                     if (!sensores || sensores.length === 0) return;
 
@@ -145,8 +149,8 @@
                 .then(res => res.json())
                 .then(data => {
                     if (!data) return;
-                    document.getElementById('totalRacks').textContent   = data.total   ?? '-';
-                    document.getElementById('totalNormal').textContent  = data.normais ?? '-';
+                    document.getElementById('totalRacks').textContent = data.total ?? '-';
+                    document.getElementById('totalNormal').textContent = data.normais ?? '-';
                     document.getElementById('totalAtencao').textContent = data.atencao ?? '-';
                     document.getElementById('totalCritico').textContent = data.criticos ?? '-';
                 })
@@ -169,7 +173,8 @@
                         return;
                     }
                     resposta.reverse();
-                    plotarGrafico(resposta, idSensor);
+                    const ultimosDez = resposta.slice(-10); 
+                    plotarGrafico(ultimosDez, idSensor);
                 })
                 .catch(erro => console.error('Erro ao obter dados:', erro));
         }
@@ -181,7 +186,7 @@
                 labels: labels,
                 datasets: [
                     { label: 'Temperatura', data: [], borderColor: 'rgb(199, 52, 52)', fill: false, tension: 0.1 },
-                    { label: 'Umidade',     data: [], borderColor: 'rgb(75, 192, 192)', fill: false, tension: 0.1 }
+                    { label: 'Umidade', data: [], borderColor: 'rgb(75, 192, 192)', fill: false, tension: 0.1 }
                 ]
             };
 
@@ -192,8 +197,8 @@
             });
 
             if (graficoPrincipal) graficoPrincipal.destroy();
-            if (graficoTemp)      graficoTemp.destroy();
-            if (graficoUmidade)   graficoUmidade.destroy();
+            if (graficoTemp) graficoTemp.destroy();
+            if (graficoUmidade) graficoUmidade.destroy();
 
             graficoPrincipal = new Chart(document.getElementById('graficoPrincipal'), { type: 'line', data: dados });
 
@@ -217,7 +222,6 @@
                 .then(novoRegistro => {
                     const novo = novoRegistro[0];
 
-                    // ✅ sem dados ainda, aguarda e tenta de novo
                     if (!novo) {
                         proximaAtualizacao = setTimeout(() => atualizarGrafico(idSensor, dados), 2000);
                         return;
@@ -241,8 +245,8 @@
                         graficoTemp.update();
                         graficoUmidade.update();
 
-                        document.getElementById('tempAtual').textContent         = `${novo.temperatura} °C`;
-                        document.getElementById('umiAtual').textContent          = `${novo.umidade} %`;
+                        document.getElementById('tempAtual').textContent = `${novo.temperatura} °C`;
+                        document.getElementById('umiAtual').textContent = `${novo.umidade} %`;
                         document.getElementById('ultimaAtualizacao').textContent = novo.dtMedicao;
                     }
 

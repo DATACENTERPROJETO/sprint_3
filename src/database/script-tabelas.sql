@@ -95,7 +95,7 @@
 
 
     INSERT INTO Sensor (modeloSensor, fkEmpresa,  fkLugar, statusSensor, dtInstalacao)
-    VALUES ('DHT11', 1, 1, 'Inativo', '2026-08-14');
+    VALUES ('DHT11', 1, 1, 'Ativo', '2026-08-14');
         
     -- SELECT 
 
