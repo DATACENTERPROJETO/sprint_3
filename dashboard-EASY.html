@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>EasyServer</title>
+
+    <link rel="stylesheet" href="../css/dashboard-EASY.css">
+
+    <script src="../js/sessao.js"></script>
+    <script src="./../js/alerta.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <body>
+    <aside class="sidebar">
+
+        <div>
+
+            <div class="logo">
+
+                <img src="./../imgs/logoEasyServerPNG.png">
+
+                <h1>EasyServer</h1>
+
+                <p>Monitoramento de Servidores</p>
+                <section class="hero">
+
+                <h1>
+                    BEM-VINDO,<br>
+                    <span> <div class="hello">
+                            <h3> <span id="b_usuario">usuário</span>!</h3>
+                        </div></span>
+                </h1>
+                </section>
+
+
+            </div>
+
+            <nav class="menu">
+                <a href="#" onclick="limparSessao()">Sair</a>
+
+            </nav>
+        </div>
+        <br>
+
+    </aside>
+
+    <header class="header">
+        <section class="header-content">
+
+            <a href="index.html" class="logo">
+                <img src="../assets/imgs/logoEasyServerPNG.png" alt="logo">
+            </a>
+
+            <h2>Dashboard</h2>
+
+            <nav>
+                <a href="https://sptech-03261044.atlassian.net/servicedesk/customer/portal/1"
+                    class="btn-suporte">Suporte</a>
+                <a href="../index.html" class="btn-sair">Sair</a>
+            </nav>
+
+        </section>
+    </header>
+
+    <main class="main">
+        <div class="resumo-datacenter">
+
+            <div class="card-resumo">
+                <h4>Total de Racks</h4>
+                <p id="totalRacks"></p>
+            </div>
+
+            <div class="card-resumo-normais">
+                <h4>Normais</h4>
+                <p class="faixa"> 20° - 25°<br>45% - 55%</p>
+                <p id="totalNormal"></p>
+            </div>
+
+            <div class="card-resumo-atencao">
+                <h4> Atenção</h4>
+                <p class="faixa">18° - 27° <br>40% - 60% </p>
+                <p id="totalAtencao"></p>
+            </div>
+
+            <div class="card-resumo-critico">
+                <h4> Críticos</h4>
+                <p class="faixa">
+                    <18 ou>27° <br>
+                        <40% ou>60%
+                </p>
+                <p id="totalCritico"></p>
+            </div>
+
+        </div>
+
+        <div class="top-bar">
+            <div class="rack-info">
+                <h3>Rack Monitorado</h3>
+                <select id="sensor" onchange="obterDadosGrafico(this.value)"></select>
+
+                <p>Sensor: <span id="sensorSelecionado"></span></p>
+                <p>Última atualização: <span id="ultimaAtualizacao"></span></p>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="esquerda">
+                <div class="kpis">
+
+                    <div class="card">
+                        <h3>Temperatura Atual</h3>
+                        <p id="tempAtual"></p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Umidade Atual</h3>
+                        <p id="umiAtual"></p>
+                    </div>
+
+                </div>
+
+                <div class="linha">
+                    <div class="graficoMenor">
+                        <h3>Temperatura</h3>
+                        <canvas id="graficoTemp"></canvas>
+                    </div>
+
+                    <div class="graficoMenor">
+                        <h3>Umidade</h3>
+                        <canvas id="graficoUmidade"></canvas>
+                    </div>
+                </div>
+
+                <div class="graficoGrande">
+                    <h3>Histórico de Temperatura e Umidade</h3>
+                    <canvas id="graficoPrincipal"></canvas>
+                </div>
+            </div>
+
+            <div class="direita">
+                <div class="box-alerta">
+                    <h2>Alertas Ativos</h2>
+                    <p id="alertas"></p>
+                    <div id="listaAlertas"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+         function limparSessao(){
+
+    sessionStorage.clear();
+
+    window.location = "../index.html";
+}
+
+     b_usuario.innerHTML = sessionStorage.NOME_USUARIO;
+
+    cargo_usuario.innerHTML =  sessionStorage.NOME_USUARIO;
+
+    const idUsuario = sessionStorage.ID_USUARIO;
+
+    
+        let proximaAtualizacao;
+        let graficoPrincipal, graficoTemp, graficoUmidade;
+
+        window.onload = function () {
+            fetch('/sensores')
+                .then(res => {
+                    if (!res.ok) throw new Error(`Erro HTTP ${res.status}: ${res.statusText}`);
+                    return res.text(); // pega como texto primeiro
+                })
+                .then(text => {
+                    if (!text) throw new Error('Resposta vazia do servidor');
+                    return JSON.parse(text); // aí converte para JSON
+                })
+                .then(sensores => {
+                    if (!sensores || sensores.length === 0) return;
+
+                    sensores.forEach(s => {
+                        document.getElementById('sensor').innerHTML +=
+                            `<option value="${s.idSensor}">${s.nomeLugar} — ${s.modeloSensor}</option>`;
+                    });
+
+                    obterDadosGrafico(sensores[0].idSensor);
+                })
+                .catch(erro => console.error('Erro ao carregar sensores:', erro));
+
+            fetch('/sensores/resumo')
+                .then(res => res.json())
+                .then(data => {
+                    if (!data) return;
+                    document.getElementById('totalRacks').textContent = data.total ?? '-';
+                    document.getElementById('totalNormal').textContent = data.normais ?? '-';
+                    document.getElementById('totalAtencao').textContent = data.atencao ?? '-';
+                    document.getElementById('totalCritico').textContent = data.criticos ?? '-';
+                })
+                .catch(erro => console.error('Erro ao carregar resumo:', erro));
+        };
+
+        function obterDadosGrafico(idSensor) {
+
+            if (proximaAtualizacao) clearTimeout(proximaAtualizacao);
+
+            document.getElementById('sensorSelecionado').textContent =
+                document.getElementById('sensor').options[document.getElementById('sensor').selectedIndex]?.text || '';
+
+            fetch(`/sensores/medicoes/ultimas/${idSensor}`, { cache: 'no-store' })
+                .then(res => res.json())
+                .then(resposta => {
+                    if (!resposta || resposta.length === 0) {
+                        // sem dados ainda, tenta de novo em 2 segundos
+                        proximaAtualizacao = setTimeout(() => obterDadosGrafico(idSensor), 2000);
+                        return;
+                    }
+                    resposta.reverse();
+                    const ultimosDez = resposta.slice(-10); 
+                    plotarGrafico(ultimosDez, idSensor);
+                })
+                .catch(erro => console.error('Erro ao obter dados:', erro));
+        }
+
+        function plotarGrafico(resposta, idSensor) {
+
+            const labels = [];
+            const dados = {
+                labels: labels,
+                datasets: [
+                    { label: 'Temperatura', data: [], borderColor: 'rgb(199, 52, 52)', fill: false, tension: 0.1 },
+                    { label: 'Umidade', data: [], borderColor: 'rgb(75, 192, 192)', fill: false, tension: 0.1 }
+                ]
+            };
+
+            resposta.forEach(reg => {
+                labels.push(reg.dtMedicao);
+                dados.datasets[0].data.push(reg.temperatura);
+                dados.datasets[1].data.push(reg.umidade);
+            });
+
+            if (graficoPrincipal) graficoPrincipal.destroy();
+            if (graficoTemp) graficoTemp.destroy();
+            if (graficoUmidade) graficoUmidade.destroy();
+
+            graficoPrincipal = new Chart(document.getElementById('graficoPrincipal'), { type: 'line', data: dados });
+
+            graficoTemp = new Chart(document.getElementById('graficoTemp'), {
+                type: 'line',
+                data: { labels: [...labels], datasets: [{ ...dados.datasets[0], data: [...dados.datasets[0].data] }] }
+            });
+
+            graficoUmidade = new Chart(document.getElementById('graficoUmidade'), {
+                type: 'line',
+                data: { labels: [...labels], datasets: [{ ...dados.datasets[1], data: [...dados.datasets[1].data] }] }
+            });
+
+            setTimeout(() => atualizarGrafico(idSensor, dados), 2000);
+        }
+
+        function atualizarGrafico(idSensor, dados) {
+
+            fetch(`/sensores/medicoes/tempo-real/${idSensor}`, { cache: 'no-store' })
+                .then(res => res.json())
+                .then(novoRegistro => {
+                    const novo = novoRegistro[0];
+
+                    if (!novo) {
+                        proximaAtualizacao = setTimeout(() => atualizarGrafico(idSensor, dados), 2000);
+                        return;
+                    }
+
+                    if (novo.dtMedicao !== dados.labels[dados.labels.length - 1]) {
+
+                        dados.labels.shift();
+                        dados.labels.push(novo.dtMedicao);
+                        dados.datasets[0].data.shift();
+                        dados.datasets[0].data.push(novo.temperatura);
+                        dados.datasets[1].data.shift();
+                        dados.datasets[1].data.push(novo.umidade);
+
+                        graficoTemp.data.labels = [...dados.labels];
+                        graficoTemp.data.datasets[0].data = [...dados.datasets[0].data];
+                        graficoUmidade.data.labels = [...dados.labels];
+                        graficoUmidade.data.datasets[0].data = [...dados.datasets[1].data];
+
+                        graficoPrincipal.update();
+                        graficoTemp.update();
+                        graficoUmidade.update();
+
+                        document.getElementById('tempAtual').textContent = `${novo.temperatura} °C`;
+                        document.getElementById('umiAtual').textContent = `${novo.umidade} %`;
+                        document.getElementById('ultimaAtualizacao').textContent = novo.dtMedicao;
+                    }
+
+                    proximaAtualizacao = setTimeout(() => atualizarGrafico(idSensor, dados), 2000);
+                })
+                .catch(erro => {
+                    console.error('Erro ao atualizar gráfico:', erro);
+                    proximaAtualizacao = setTimeout(() => atualizarGrafico(idSensor, dados), 2000);
+                });
+        }
+
+    </script>
+</body>
+
+</html>
